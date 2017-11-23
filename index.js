@@ -1,28 +1,19 @@
 'use strict';
 
+const latestTweets = require('latest-tweets')
+
+const tokens = {
+  consumer_key:        process.env.TWITTER_CONSUMER_KEY,
+  consumer_secret:     process.env.TWITTER_CONSUMER_SECRET,
+  access_token:        process.env.TWITTER_ACCESS_TOKEN_KEY,
+  access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
+};
+
 const helpers = require('./helpers');
 const messages = require('./messages');
 const alexaLogger = require('./logger');
 
 // --------------- Functions that control the skill's behavior -----------------------
-
-const data = [
-    {
-        name: 'Lambda Functions',
-        description: 'Lambda functions description',
-        slotVal: 'lambda'
-    },
-    {
-        name: 'EC2',
-        description: 'EC2 description',
-        slotVal: 'ec2'
-    },
-    {
-        name: 'BeanStalk Functions',
-        description: 'BeanStalk description',
-        slotVal: 'beanstalk'
-    },
-];
 
 function getWelcomeResponse(callback) {
   // If we wanted to initialize the session to have some attributes we could add those here.
@@ -56,9 +47,11 @@ function handleSessionHelpRequest(callback) {
     callback({}, helpers.buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
-function getIntentResponse(intent) {
-    const resp = data.filter(item => item.slotVal === intent);
-    return resp.length ? resp[0].description : 'No service found in our record';
+function getIntentResponse(username, cb) {
+  let speechOutput;
+  latestTweets(username, (err, tweets) => {
+    cb(tweets[0].content);
+  });
 }
 
 /**
@@ -71,15 +64,17 @@ function getDataViaSlotVal(intent, session, callback) {
     return handleSessionEndRequest(callback);
   }
   const cardTitle = intent.name;
-  const slot = intent.slots['Service'];
+  const slot = intent.slots['Username'];
   alexaLogger.logInfo(`Term ${slot.value} requested`);
   let repromptText = '';
   let sessionAttributes = {};
   const shouldEndSession = false;
-  let speechOutput = getIntentResponse(slot.value);
-  alexaLogger.logInfo(`Recieved data from table for sessionId=${session.sessionId}: ${speechOutput}`);
-  callback(sessionAttributes,
-      helpers.buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+  getIntentResponse(slot.value, (res) => {
+    let speechOutput = res;
+    alexaLogger.logInfo(`Recieved data for sessionId=${session.sessionId}: ${speechOutput}`);
+    callback(sessionAttributes,
+        helpers.buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
+  });
 }
 
 
@@ -109,7 +104,6 @@ function onIntent(intentRequest, session, callback) {
   alexaLogger.logInfo(`onIntent requestId=${intentRequest.requestId}, sessionId=${session.sessionId}`);
 
   const intent = intentRequest.intent;
-  const intentName = intentRequest.intent.name;
   getDataViaSlotVal(intent, session, callback);
 }
 
