@@ -1,0 +1,11 @@
+{
+  "name": "aws-delhi-dec-meetup-alexa-skill",
+  "version": "1.0.0",
+  "description": "Demo alexa skill for [aws-delhi](https://www.meetup.com/AmazonAWS-Delhi) meetup group, for December meetup.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mukul <mukul1904@gmail.com>",
+  "license": "ISC"
+}
