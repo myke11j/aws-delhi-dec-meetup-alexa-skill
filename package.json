@@ -9,6 +9,20 @@
     "deploy": "node-lambda deploy"
   },
   "author": "Mukul <mukul1904@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/myke11j/aws-delhi-dec-meetup-alexa-skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/myke11j/aws-delhi-dec-meetup-alexa-skill/issues"
+  },
+  "homepage": "https://github.com/myke11j/aws-delhi-dec-meetup-alexa-skill#readme",
+  "keywords": [
+    "alexa",
+    "alexa-skill",
+    "aws-delhi",
+    "twitter"
+  ],
   "license": "ISC",
   "dependencies": {
     "latest-tweets": "^1.0.3",
